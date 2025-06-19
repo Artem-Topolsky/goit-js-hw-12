@@ -184,15 +184,23 @@ html {
 }
 
 .spinner {
-  width: 60px;
-  height: 60px;
-  background: url('https://cdn-icons-png.flaticon.com/512/1828/1828884.png')
-    no-repeat center center;
-  background-size: contain;
-  animation: spin 2s linear infinite;
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+}
+.spinner::after {
+  content: ' ';
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 5px solid #3f80ff;
+  border-color: #3f80ff transparent #3f80ff transparent;
+  animation: dual-ring 1.2s linear infinite;
 }
 
-@keyframes spin {
+@keyframes dual-ring {
   0% {
     transform: rotate(0deg);
   }
@@ -200,7 +208,6 @@ html {
     transform: rotate(360deg);
   }
 }
-
 .hidden {
   display: none;
 }

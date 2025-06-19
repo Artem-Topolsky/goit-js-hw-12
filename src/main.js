@@ -12,15 +12,24 @@ import 'izitoast/dist/css/iziToast.min.css';
 
 const form = document.querySelector('.form');
 const loadMoreBtn = document.querySelector('.load-more-btn');
+const input = form.elements['search-text'];
+
 let query = '';
 let page = 1;
-let totalHits = 0; 
+let totalHits = 0;
 
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  query = e.currentTarget.elements['search-text'].value.trim();
+  query = input.value.trim();
+
   if (!query) {
-    return iziToast.warning({ title: 'Warning', message: 'Enter a search term', position: 'topRight' });
+    iziToast.warning({
+      title: 'Warning',
+      message: 'Enter a search term',
+      position: 'topRight',
+    });
+    input.value = '';
+    return;
   }
 
   page = 1;
@@ -33,39 +42,71 @@ form.addEventListener('submit', async e => {
     totalHits = data.totalHits;
 
     if (data.hits.length === 0) {
-      iziToast.error({ title: 'Error', message: 'No images found', position: 'topRight' });
+      iziToast.error({
+        title: 'Error',
+        message: 'Failed to load images',
+        position: 'topRight',
+      });
+      input.value = '';
       return;
     }
 
     createGallery(data.hits);
+    input.value = '';
 
-
-    if (page * 15 < totalHits) showLoadMoreButton();
+    if (page * 15 < totalHits) {
+      showLoadMoreButton();
+    }
   } catch {
-    iziToast.error({ title: 'Error', message: 'Something went wrong', position: 'topRight' });
+    iziToast.error({
+      title: 'Error',
+      message: 'Something went wrong',
+      position: 'topRight',
+    });
   } finally {
-    hideLoader();
+    setTimeout(() => {
+      hideLoader();
+    }, 500);
   }
 });
 
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
+  hideLoadMoreButton();
   showLoader();
+
   try {
     const data = await getImagesByQuery(query, page);
     createGallery(data.hits);
-    
-    const { height: cardHeight } = document.querySelector('.gallery .gallery-item').getBoundingClientRect();
-    window.scrollBy({ top: cardHeight * 2, behavior: 'smooth' });
+
+    const { height: cardHeight } = document
+      .querySelector('.gallery .gallery-item')
+      .getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
 
     if (page * 15 >= totalHits) {
-      hideLoadMoreButton();
-      iziToast.info({ message: "We're sorry, but you've reached the end of search results.", position: 'topRight' });
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
+    } else {
+      setTimeout(() => {
+        showLoadMoreButton();
+      }, 500);
     }
   } catch {
-    iziToast.error({ title: 'Error', message: 'Something went wrong', position: 'topRight' });
-    
+    iziToast.error({
+      title: 'Error',
+      message: 'Something went wrong',
+      position: 'topRight',
+    });
   } finally {
-    hideLoader();
+    setTimeout(() => {
+      hideLoader();
+    }, 500);
   }
 });
