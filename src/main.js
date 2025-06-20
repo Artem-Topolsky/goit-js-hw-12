@@ -13,7 +13,7 @@ import 'izitoast/dist/css/iziToast.min.css';
 const form = document.querySelector('.form');
 const loadMoreBtn = document.querySelector('.load-more-btn');
 const input = form.elements['search-text'];
-
+const per_page = 15;
 let query = '';
 let page = 1;
 let totalHits = 0;
@@ -47,14 +47,14 @@ form.addEventListener('submit', async e => {
         message: 'Failed to load images',
         position: 'topRight',
       });
-      input.value = '';
+      input.select();
       return;
     }
 
     createGallery(data.hits);
     input.value = '';
 
-    if (page * 15 < totalHits) {
+    if (page * per_page < totalHits) {
       showLoadMoreButton();
     }
   } catch {
@@ -88,7 +88,7 @@ loadMoreBtn.addEventListener('click', async () => {
       behavior: 'smooth',
     });
 
-    if (page * 15 >= totalHits) {
+    if (page * per_page >= totalHits) {
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
         position: 'topRight',
